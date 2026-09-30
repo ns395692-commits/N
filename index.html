@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mock Test</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0a1424;color:#eaf1fb;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh;max-width:640px;margin:auto;position:relative}
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+.scroll{flex:1;overflow-y:auto;padding:18px;-webkit-overflow-scrolling:touch;padding-bottom:80px}
+.scroll::-webkit-scrollbar{display:none}
+.hdr{padding:14px 16px;display:flex;align-items:center;gap:10px;background:#0a1424;border-bottom:1px solid #24395c;flex-shrink:0;position:relative}
+.hdr::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff9933 33%,#fff 33% 66%,#22a05a 66%)}
+.hdr h1{font-size:20px;font-weight:700;flex:1;color:#eaf1fb}
+.hdr .sub{font-size:11px;color:#8fa3bf;margin-top:2px}
+.btn{display:block;width:100%;padding:15px;border:none;border-radius:14px;background:#ff9f3f;color:#1b1205;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;transition:.15s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:#eaf1fb;border:1px solid #24395c}
+.btn.danger{background:#f87171;color:#2a0808}
+.btn.admin{background:transparent;color:#8fa3bf;border:1px solid #24395c;font-size:13px;padding:11px;margin-top:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.field{background:#111f36;border:1px solid #24395c;border-radius:14px;padding:14px;margin-bottom:12px}
+.field label{display:block;font-size:11px;color:#ff9f3f;margin-bottom:7px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.field input{width:100%;padding:13px;border:1.5px solid #24395c;background:#0a1424;border-radius:10px;font-size:16px;outline:none;color:#fff;font-family:inherit}
+.field input:focus{border-color:#3b82f6}
+.field input::placeholder{color:#64748b}
+.err{color:#f87171;font-size:13px;min-height:16px;margin:6px 0}
+.hero{padding:22px 18px 14px;text-align:center}
+.hero .badge{display:inline-block;background:transparent;border:1px solid #24395c;color:#8fa3bf;padding:5px 12px;border-radius:20px;font-size:10px;letter-spacing:2px;margin-bottom:10px;font-weight:700}
+.hero h2{font-size:32px;font-weight:700;color:#eaf1fb}
+.hero h2 span{color:#ff9f3f}
+.hero p{font-size:13px;color:#8fa3bf;margin-top:6px}
+.live-clock{background:#111f36;border:1px solid #24395c;border-radius:14px;padding:14px;margin:14px 0;text-align:center}
+.live-clock .status{font-size:13px;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+.live-clock .status.live{color:#34d399}
+.live-clock .status.waiting{color:#fbbf24}
+.live-clock .status.closed{color:#f87171}
+.live-clock .time{font-size:28px;font-weight:900;color:#eaf1fb;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.live-clock .sub{font-size:11px;color:#8fa3bf;margin-top:6px}
+.timer{background:#162846;border:1px solid #35558a;padding:6px 14px;border-radius:10px;font-size:20px;font-weight:800;letter-spacing:1px;color:#eaf1fb;font-variant-numeric:tabular-nums}
+.timer.warn{background:#f87171;color:#2a0808;border-color:#f87171;animation:p 1s infinite}
+@keyframes p{50%{opacity:.7}}
+.qmeta{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#111f36;border-bottom:1px solid #24395c;font-size:13px;color:#8fa3bf;font-weight:600}
+.qmeta b{color:#ff9f3f}
+.qbox{background:#111f36;border:1px solid #24395c;border-radius:14px;padding:18px;margin-bottom:14px}
+.qnum{font-size:10px;color:#ff9f3f;font-weight:800;letter-spacing:1.5px;margin-bottom:8px}
+.qtext{font-size:16px;line-height:1.55;font-weight:600;color:#fff}
+.opt{background:#111f36;border:1.5px solid #24395c;border-radius:12px;padding:14px;margin-bottom:9px;display:flex;gap:12px;cursor:pointer;font-size:14px;line-height:1.4;color:#e2e8f0;align-items:center;transition:.15s}
+.opt:active{transform:scale(.98)}
+.opt .lt{width:28px;height:28px;flex-shrink:0;border-radius:7px;background:#162846;color:#a5b4fc;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+.opt.sel{background:#173a70;border-color:#3b82f6}
+.opt.sel .lt{background:#3b82f6;color:#fff}
+.nav{display:flex;gap:8px;padding:12px 16px;background:#0a1424;border-top:1px solid #24395c;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.nav button{flex:1;padding:13px;border:none;border-radius:11px;font-size:14px;font-weight:700;background:#3b82f6;color:#fff;cursor:pointer}
+.nav button.ghost{background:transparent;color:#eaf1fb;border:1px solid #24395c}
+.nav button:disabled{opacity:.35}
+.result{text-align:center;padding:12px 0}
+.ring{width:150px;height:150px;margin:0 auto 14px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .val b{font-size:32px;font-weight:900;color:#ff9f3f}
+.ring .val small{font-size:11px;color:#8fa3bf;margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.stat{background:#111f36;border:1px solid #24395c;border-radius:12px;padding:14px;text-align:center}
+.stat b{display:block;font-size:22px;font-weight:900;margin-bottom:2px}
+.stat span{font-size:11px;color:#8fa3bf}
+.stat.g b{color:#34d399}.stat.r b{color:#f87171}.stat.y b{color:#fbbf24}.stat.b b{color:#3b82f6}
+.instr{background:#111f36;border:1px solid #24395c;border-radius:14px;padding:18px;margin-bottom:12px}
+.instr h4{font-size:14px;color:#ff9f3f;margin-bottom:10px;font-weight:800}
+.instr ul{padding-left:20px;font-size:13px;line-height:1.9;color:#cbd5e1}
+.warn-box{background:rgba(248,113,113,.1);border:1px solid #f87171;border-radius:14px;padding:14px;font-size:12px;line-height:1.7;color:#fca5a5;margin-bottom:14px}
+.warn-box b{color:#f87171}
+.info-box{background:rgba(59,130,246,.1);border:1px solid #3b82f6;border-radius:14px;padding:14px;font-size:12px;line-height:1.7;color:#93c5fd;margin-bottom:14px}
+.info-box b{color:#60a5fa}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.overlay.show{display:flex}
+.modal{background:#111f36;border:1px solid #24395c;border-radius:18px;padding:22px;max-width:400px;width:100%;text-align:center}
+.modal h3{font-size:20px;color:#f87171;margin-bottom:10px}
+.modal p{font-size:13px;color:#cbd5e1;line-height:1.6;margin-bottom:14px}
+.empty{text-align:center;padding:40px 20px;color:#64748b;font-size:13px}
+.loading{text-align:center;padding:40px;color:#a5b4fc;font-size:13px}
+.tabs{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid #24395c;overflow-x:auto;flex-shrink:0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{padding:8px 14px;border:1px solid #24395c;background:transparent;border-radius:18px;font-size:12px;font-weight:700;color:#8fa3bf;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.row{display:flex;align-items:center;gap:12px;background:#111f36;border:1px solid #24395c;border-radius:12px;padding:12px;margin-bottom:8px}
+.av{width:38px;height:38px;border-radius:50%;background:#162846;display:grid;place-items:center;font-weight:700;font-size:17px;color:#ff9f3f;flex-shrink:0}
+.row .m{flex:1;min-width:0}
+.row .m b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .m small{font-size:11px;color:#8fa3bf;display:block;margin-top:2px}
+.pct{font-weight:700;font-size:22px;min-width:52px;text-align:right}
+.pct.g{color:#34d399}.pct.y{color:#fbbf24}.pct.r{color:#f87171}
+.rank-badge{display:inline-block;width:26px;height:26px;border-radius:50%;background:#162846;color:#8fa3bf;font-weight:900;font-size:12px;text-align:center;line-height:26px;margin-right:6px}
+.rank-badge.r1{background:#fbbf24;color:#fff}
+.rank-badge.r2{background:#cbd5e1;color:#1e293b}
+.rank-badge.r3{background:#f97316;color:#fff}
+.flag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:4px}
+.flag.red{background:rgba(248,113,113,.2);color:#f87171;border:1px solid rgba(248,113,113,.4)}
+.flag.yellow{background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.4)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:#111f36;border:1px solid #24395c;border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:32px;line-height:1;font-weight:700;color:#ff9f3f}
+.kpi span{font-size:11px;color:#8fa3bf;margin-top:4px;display:block}
+/* ===== HIDE NETLIFY BADGE ===== */
+a[href*="netlify.com"],
+iframe[title*="Netlify"],
+iframe[src*="netlify.com"],
+.netlify-badge,
+div[data-netlify-badge],
+[data-netlify="true"],
+[id^="netlify-badge"],
+[class*="netlify-badge"]{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  width:0 !important;
+  height:0 !important;
+  position:absolute !important;
+  top:-9999px !important;
+  left:-9999px !important;
+  z-index:-9999 !important;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="screen active" id="entry">
+  <div class="hero">
+    <div class="badge">✈ INDIAN AIR FORCE</div>
+    <h2>Agniveer <span>Vayu</span></h2>
+    <p>Mock Test • 30 Questions • 30 Minutes</p>
+  </div>
+  <div class="scroll">
+    <div class="live-clock" id="liveClock">
+      <div class="status" id="clockStatus">🔄 Loading...</div>
+      <div class="time" id="clockTime">--:--:--</div>
+      <div class="sub" id="clockSub">Test window: 4:00 PM - 5:00 PM</div>
+    </div>
+    <div class="field">
+      <label>Roll No / Unique ID *</label>
+      <input type="text" id="inpRoll" placeholder="Enter your roll number" maxlength="20" autocapitalize="characters" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Full Name *</label>
+      <input type="text" id="inpName" placeholder="Enter your full name" maxlength="40" onkeydown="if(event.key==='Enter')startEntry()">
+    </div>
+    <div class="err" id="entryErr"></div>
+    <button class="btn" id="btnStart" onclick="startEntry()">Start Test →</button>
+    <button class="btn admin" onclick="openPin()">🔐 Admin Login</button>
+    <div class="warn-box" style="margin-top:14px">
+      <b>⚠️ Important:</b><br>
+      • Test window: <b>4:00 PM - 5:00 PM</b><br>
+      • Har student ko 30 min milega (max 5:00 PM tak)<br>
+      • Ek roll se <b>sirf ek baar</b> test<br>
+      • Tab switch karne pe <b>cheat detect</b><br>
+      • 3 baar tab switch = auto submit
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="blocked">
+  <div class="hero">
+    <div class="badge">⚠️ ALREADY ATTEMPTED</div>
+    <h2 style="color:#f87171">Access Denied</h2>
+    <p id="blockedSub">You have already attempted this test</p>
+  </div>
+  <div class="scroll">
+    <div class="instr" id="blockedInfo"></div>
+    <button class="btn ghost" onclick="exitTest()">← Back to Entry</button>
+  </div>
+</div>
+
+<div class="screen" id="instr">
+  <div class="hdr">
+    <div style="flex:1">
+      <h1>Instructions</h1>
+      <div class="sub">Padho dhyaan se</div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="instr">
+      <h4>📋 Test Details</h4>
+      <ul>
+        <li>Total: <b style="color:#ff9f3f">30 Questions</b> (15 English + 15 GK)</li>
+        <li>Time: <b style="color:#ff9f3f" id="instrTime">30 Minutes</b></li>
+        <li>Marking: <b style="color:#34d399">+1 Correct</b> • <b style="color:#f87171">-0.25 Wrong</b></li>
+      </ul>
+    </div>
+    <div class="warn-box">
+      <b>🚨 Anti-Cheat Active:</b><br>
+      • Tab switch = warning<br>
+      • 3 warnings = auto submit<br>
+      • Right-click, copy-paste, F12 blocked<br>
+      • Fullscreen me raho
+    </div>
+    <div class="instr">
+      <h4>📌 Rules</h4>
+      <ul>
+        <li>Har question me 4 options, 1 sahi</li>
+        <li>Skip kar sakte ho, marks nahi katenge</li>
+        <li>Timer 00:00 pe auto-submit</li>
+        <li>Ek baar submit kiya, wapas nahi</li>
+      </ul>
+    </div>
+    <button class="btn" onclick="beginTest()">Start Test →</button>
+    <button class="btn ghost" onclick="exitTest()">Cancel</button>
+  </div>
+</div>
+
+<div class="screen" id="test">
+  <div class="hdr">
+    <div style="flex:1">
+      <h1 id="testName">Test</h1>
+      <div class="sub" id="testRoll">Roll No</div>
+    </div>
+    <div class="timer" id="timer">30:00</div>
+  </div>
+  <div class="qmeta">
+    <span>Q <b id="qNow">1</b> / <b id="qTot">30</b></span>
+    <span id="answered">0 answered</span>
+  </div>
+  <div class="scroll" id="qScroll">
+    <div class="qbox">
+      <div class="qnum" id="qSec">ENGLISH</div>
+      <div class="qtext" id="qText">Loading...</div>
+    </div>
+    <div id="optBox"></div>
+  </div>
+  <div class="nav">
+    <button class="ghost" id="btnPrev" onclick="navQ(-1)">← Prev</button>
+    <button id="btnNext" onclick="navQ(1)">Next →</button>
+  </div>
+</div>
+
+<div class="screen" id="result">
+  <div class="hdr">
+    <div style="flex:1">
+      <h1>Test Complete</h1>
+      <div class="sub">Your Result</div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="result">
+      <div class="ring">
+        <svg width="150" height="150">
+          <circle cx="75" cy="75" r="65" stroke="#24395c" stroke-width="10" fill="none"/>
+          <circle id="ringCircle" cx="75" cy="75" r="65" stroke="#ff9f3f" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="408" stroke-dashoffset="408"/>
+        </svg>
+        <div class="val"><b id="resPct">0%</b><small id="resScore">0 / 30</small></div>
+      </div>
+      <div id="resVerdict" style="font-size:16px;font-weight:800;color:#ff9f3f;margin-bottom:6px">Good effort!</div>
+      <div style="font-size:11px;color:#8fa3bf" id="syncStatus">☁️ Saving...</div>
+    </div>
+    <div class="stats">
+      <div class="stat b"><b id="sTotal">0</b><span>Total</span></div>
+      <div class="stat g"><b id="sCorrect">0</b><span>Correct</span></div>
+      <div class="stat r"><b id="sWrong">0</b><span>Wrong</span></div>
+      <div class="stat y"><b id="sSkip">0</b><span>Skipped</span></div>
+    </div>
+    <div class="instr" style="margin-top:16px">
+      <h4>✅ Test Submitted</h4>
+      <ul>
+        <li>Aapka test submit ho gaya</li>
+        <li>Dobara attempt nahi kar sakte</li>
+        <li>Final report admin publish karega</li>
+      </ul>
+    </div>
+    <div id="cheatSummary"></div>
+  </div>
+</div>
+
+<div class="screen" id="admin">
+  <div class="hdr">
+    <button class="btn ghost" style="width:auto;padding:10px 14px;margin:0;font-size:14px" onclick="leaveAdmin()">←</button>
+    <div style="flex:1"><h1>Admin Panel</h1><div class="sub" id="admSub">Connecting...</div></div>
+    <button class="btn ghost" style="width:auto;padding:10px 14px;margin:0;font-size:14px" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+  <div class="tabs">
+    <button class="on" data-tab="overview" onclick="switchTab('overview',this)">Overview</button>
+    <button data-tab="ranking" onclick="switchTab('ranking',this)">Ranking</button>
+    <button data-tab="cheat" onclick="switchTab('cheat',this)">Cheat Log</button>
+    <button data-tab="active" onclick="switchTab('active',this)">In Progress</button>
+  </div>
+  <div class="scroll" id="admBox"><div class="loading">Loading...</div></div>
+</div>
+
+<div class="overlay" id="warnOverlay">
+  <div class="modal">
+    <h3 id="warnTitle">⚠️ Warning!</h3>
+    <p id="warnMsg">Tab switch detected.</p>
+    <button class="btn" onclick="closeWarn()">OK, understood</button>
+  </div>
+</div>
+
+<div class="overlay" id="pinOverlay">
+  <div class="modal">
+    <h3 style="color:#ff9f3f">🔐 Admin Login</h3>
+    <p>Enter admin PIN</p>
+    <div class="field" style="margin-bottom:10px"><input type="password" id="pinInput" inputmode="numeric" placeholder="PIN" onkeydown="if(event.key==='Enter')checkPin()"></div>
+    <div class="err" id="pinErr"></div>
+    <button class="btn" onclick="checkPin()">Unlock</button>
+    <button class="btn ghost" onclick="closePin()">Cancel</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCPxkw6YxAMCBqvQdFJqfwjpmJuPNaTuwA",
+  authDomain: "agv-test-pro.firebaseapp.com",
+  databaseURL: "https://agv-test-pro-default-rtdb.firebaseio.com",
+  projectId: "agv-test-pro",
+  storageBucket: "agv-test-pro.firebasestorage.app",
+  messagingSenderId: "280031865529",
+  appId: "1:280031865529:web:c914ef1bfb48bc27638968"
+};
+const ADMIN_PIN = "7896";
+const TEST_DURATION_SEC = 30 * 60;
+const MAX_TAB_SWITCHES = 3;
+const EVENT_KEY = "mock_test_1";
+const TEST_START_HOUR = 0;
+const TEST_END_HOUR = 23;
+
+function getTodayStart(){const d=new Date();d.setHours(TEST_START_HOUR,0,0,0);return d.getTime();}
+function getTodayEnd(){const d=new Date();d.setHours(TEST_END_HOUR,59,59,999);return d.getTime();}
+function getWindowState(){const n=Date.now();if(n<getTodayStart())return"waiting";if(n>getTodayEnd())return"closed";return"live";}
+function fmtClock(ms){const t=Math.floor(ms/1000);return pad(Math.floor(t/3600))+":"+pad(Math.floor((t%3600)/60))+":"+pad(t%60);}
+
+(function(){
+  const s1=document.createElement('script');
+  s1.src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js";
+  s1.onload=()=>{
+    const s2=document.createElement('script');
+    s2.src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js";
+    s2.onload=()=>{
+      const s3=document.createElement('script');
+      s3.src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js";
+      s3.onload=initFirebase;
+      document.head.appendChild(s3);
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+})();
+
+let db=null, auth=null, cloudUid=null, fbReady=false;
+function initFirebase(){
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.database();
+    auth=firebase.auth();
+    auth.signInAnonymously().then(c=>{
+      cloudUid=c.user.uid;fbReady=true;
+      if(document.getElementById('admin').classList.contains('active')) startAdminLive();
+    }).catch(e=>console.warn("Auth failed:",e));
+  }catch(e){console.warn("Firebase init failed:",e);}
+}
+
+const $=id=>document.getElementById(id);
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function parseQ(arr){return arr.map(x=>({q:x[0],o:x[1].split("|"),a:x[2]}));}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function pad(n){return String(n).padStart(2,'0');}
+function fmtTime(s){return Math.floor((s||0)/60)+':'+pad((s||0)%60);}
+
+const ENGLISH=[["Choose the synonym of 'Abandon'.","Retain|Forsake|Cherish|Keep","B"],["Choose the synonym of 'Candid'.","Secretive|Frank|Rude|Shy","B"],["Choose the synonym of 'Diligent'.","Lazy|Hardworking|Careless|Slow","B"],["Choose the synonym of 'Enormous'.","Tiny|Huge|Narrow|Weak","B"],["Choose the synonym of 'Furious'.","Calm|Happy|Angry|Tired","C"],["Choose the synonym of 'Humble'.","Arrogant|Modest|Proud|Rude","B"],["Choose the synonym of 'Immense'.","Small|Vast|Short|Thin","B"],["Choose the synonym of 'Jubilant'.","Sad|Joyful|Angry|Silent","B"],["Choose the synonym of 'Lucid'.","Confusing|Clear|Dark|Hidden","B"],["Choose the synonym of 'Prudent'.","Reckless|Wise|Foolish|Lazy","B"],["Choose the synonym of 'Tenacious'.","Weak|Persistent|Lazy|Slow","B"],["Choose the synonym of 'Vivid'.","Dull|Bright|Dark|Weak","B"],["Choose the synonym of 'Benevolent'.","Cruel|Kind|Rude|Harsh","B"],["Choose the synonym of 'Gregarious'.","Shy|Sociable|Rude|Silent","B"],["Choose the synonym of 'Meticulous'.","Careless|Precise|Lazy|Rude","B"],["Choose the antonym of 'Transparent'.","Clear|Opaque|Lucid|Visible","B"],["Choose the antonym of 'Ancient'.","Old|Modern|Historic|Past","B"],["Choose the antonym of 'Victory'.","Success|Defeat|Triumph|Win","B"],["Choose the antonym of 'Bold'.","Brave|Cowardly|Strong|Fearless","B"],["Choose the antonym of 'Expand'.","Grow|Contract|Increase|Spread","B"],["Choose the antonym of 'Rare'.","Scarce|Common|Unique|Few","B"],["Choose the antonym of 'Timid'.","Shy|Bold|Weak|Quiet","B"],["Choose the antonym of 'Gain'.","Win|Lose|Earn|Profit","B"],["Choose the antonym of 'Praise'.","Applaud|Criticize|Honour|Cheer","B"],["Choose the antonym of 'Rigid'.","Hard|Flexible|Stiff|Firm","B"],["One word: A person who loves books.","Bibliophile|Philatelist|Numismatist|Linguist","A"],["One word: Fear of water.","Hydrophobia|Acrophobia|Claustrophobia|Xenophobia","A"],["One word: Government by the people.","Monarchy|Democracy|Autocracy|Oligarchy","B"],["One word: A place where birds are kept.","Aviary|Apiary|Aquarium|Zoo","A"],["One word: That which cannot be avoided.","Avoidable|Inevitable|Possible|Uncertain","B"],["One word: One who is all-powerful.","Omnipotent|Omnipresent|Omniscient|Optimist","A"],["One word: One who knows everything.","Omnipotent|Omnipresent|Omniscient|Optimist","C"],["One word: One who never drinks alcohol.","Drunkard|Teetotaller|Alcoholic|Addict","B"],["One word: One who hates mankind.","Philanthropist|Misanthrope|Misogynist|Optimist","B"],["One word: One who loves mankind.","Philanthropist|Misanthrope|Misogynist|Egoist","A"],["Idiom: 'To let the cat out of the bag'.","To free a cat|To reveal a secret|To create confusion|To act foolishly","B"],["Idiom: 'Once in a blue moon'.","Very often|Rarely|Never|Always","B"],["Idiom: 'A piece of cake'.","A sweet dish|Something very easy|A small gift|A difficult task","B"],["Idiom: 'Break the ice'.","To melt ice|To start a conversation|To break something|To cool down","B"],["Idiom: 'In the nick of time'.","Too late|Just in time|Very early|Never","B"],["Idiom: 'Spill the beans'.","To cook|To reveal a secret|To drop food|To waste","B"],["Idiom: 'A bolt from the blue'.","Sudden shock|Pleasant news|Heavy rain|Thunderstorm","A"],["Idiom: 'Bury the hatchet'.","To hide a weapon|To make peace|To dig a hole|To fight again","B"],["Idiom: 'Turn a deaf ear'.","To listen carefully|To ignore|To become deaf|To shout","B"],["Idiom: 'A blessing in disguise'.","A hidden good|A curse|A visible gift|A punishment","A"],["Correctly spelled word.","Accommodation|Accomodation|Acommodation|Accommodetion","A"],["Correctly spelled word.","Occurence|Ocurence|Occurrence|Occurrance","C"],["Correctly spelled word.","Definitly|Definetely|Definitely|Definitelly","C"],["Correctly spelled word.","Embarass|Embarrass|Embaras|Embarras","B"],["Correctly spelled word.","Receive|Recieve|Receeve|Receve","A"],["Correctly spelled word.","Separate|Seperate|Separete|Seprate","A"],["Correctly spelled word.","Necessary|Neccessary|Necessery|Necesary","A"],["Correctly spelled word.","Privilege|Priviledge|Privilage|Privilig","A"],["Fill: He is good ___ mathematics.","at|in|on|for","A"],["Fill: She has been living here ___ 2010.","for|since|from|by","B"],["Fill: The cat jumped ___ the table.","on|upon|onto|into","C"],["Fill: If I ___ rich, I would travel.","am|was|were|will be","C"],["Fill: He is senior ___ me.","than|to|from|of","B"],["Fill: She is angry ___ me.","on|with|at|for","B"],["Fill: I have been waiting ___ two hours.","since|for|from|by","B"],["Fill: Neither of the boys ___ present.","are|is|were|have","B"],["Fill: He is ___ honest man.","a|an|the|no article","B"],["Fill: The sun rises ___ the east.","on|in|at|from","B"],["Fill: She is good ___ singing.","in|at|on|for","B"],["Plural of 'Crisis'.","Crisises|Crises|Crisis|Crisi","B"],["Plural of 'Child'.","Childs|Childes|Children|Childrens","C"],["Plural of 'Ox'.","Oxes|Oxen|Oxs|Ox","B"],["Plural of 'Mouse'.","Mouses|Mice|Mices|Mouse","B"],["Plural of 'Leaf'.","Leafs|Leaves|Leafes|Leaf","B"],["Plural of 'Knife'.","Knifes|Knives|Knifees|Knifs","B"],["Plural of 'Woman'.","Womans|Women|Womens|Woman","B"],["Plural of 'Formula'.","Formulas only|Formulae only|Formulas/Formulae|Formul","C"],["Passive: She wrote a letter.","A letter was written by her.|A letter is written by her.|A letter has written by her.|A letter was wrote by her.","A"],["Passive: Someone has stolen my pen.","My pen was stolen.|My pen has been stolen.|My pen is stolen.|My pen had been stolen.","B"],["Passive: Open the door.","The door is opened.|The door was opened.|Let the door be opened.|The door has opened.","C"],["Passive: We must obey the rules.","The rules must obey.|The rules must be obeyed.|The rules are obeyed.|The rules were obeyed.","B"],["Passive: They are playing football.","Football is played by them.|Football is being played by them.|Football was played by them.|Football has played by them.","B"],["Indirect: He said, 'I am busy.'","He said that he is busy.|He said that he was busy.|He says that he was busy.|He said that I am busy.","B"],["Indirect: 'Where do you live?'","He asked where did I live.|He asked where I lived.|He asked where I live.|He asked where do I live.","B"],["Indirect: 'Please help me.'","She said to help her.|She requested to help her.|She requested me to help her.|She ordered me to help her.","C"],["Error: One of my friend is a doctor.","One of|my friend|is|a doctor","B"],["Error: He don't like tea.","He|don't|like|tea","B"],["Error: She is more taller than her sister.","She is|more taller|than|her sister","B"],["Error: The news are good.","The|news|are|good","C"],["Error: My hairs are black.","My|hairs|are|black","B"],["Correct sentence.","He don't like tea.|He doesn't likes tea.|He doesn't like tea.|He not like tea.","C"],["Correct sentence.","He is knowing me.|He knows me.|He know me.|He is know me.","B"],["Correct sentence.","The news is good.|The news are good.|The news were good.|The news have good.","A"],["Correct sentence.","He is my cousin.|He is my cousin brother.|He is my brother cousin.|He my cousin.","A"],["Article: He is ___ M.A. graduate.","a|an|the|no article","B"],["Article: She is ___ honest girl.","a|an|the|no","B"],["Tense: He ___ to school every day.","go|goes|going|gone","B"],["Modal: You ___ obey your parents.","can|may|should|might","C"],["Preposition: She is angry ___ me.","on|at|with|for","C"],["Pronoun: This book is ___.","my|mine|me|I","B"],["Degree: Ram is the ___ of all boys.","tall|taller|tallest|more tall","C"],["Conditional: If it rains, we ___ stay home.","will|would|shall|should","A"],["I wish I ___ a bird.","am|was|were|will be","C"],["She suggested ___ a movie.","to watch|watching|watch|watched","B"],["I cannot put ___ with his behaviour.","on|up|off|in","B"],["He gave ___ smoking.","up|in|out|off","A"],["The car broke ___ on the highway.","down|out|up|off","A"]];
+
+const GK=[["Father of the Indian Constitution?","Mahatma Gandhi|Jawaharlal Nehru|Dr. B.R. Ambedkar|Sardar Patel","C"],["First Prime Minister of India?","Sardar Patel|Jawaharlal Nehru|Rajendra Prasad|Lal Bahadur Shastri","B"],["First President of India?","Dr. Rajendra Prasad|Dr. Radhakrishnan|Zakir Hussain|Nehru","A"],["Battle of Plassey in:","1757|1764|1857|1947","A"],["Dandi March by:","Subhash Chandra Bose|Mahatma Gandhi|Bhagat Singh|Nehru","B"],["Founder of Maurya Empire?","Ashoka|Chandragupta Maurya|Bindusara|Samudragupta","B"],["First War of Independence:","1857|1858|1885|1942","A"],["Wrote 'Discovery of India'?","Gandhi|Nehru|Tagore|Patel","B"],["Quit India Movement:","1930|1942|1919|1929","B"],["Iron Man of India?","Nehru|Sardar Patel|Bhagat Singh|Bose","B"],["Founded INC?","A.O. Hume|Gandhi|Nehru|Tilak","A"],["Last Mughal Emperor?","Akbar|Bahadur Shah Zafar|Aurangzeb|Shah Jahan","B"],["Founder of Mughal Empire?","Akbar|Babur|Humayun|Aurangzeb","B"],["First Battle of Panipat:","1526|1556|1761|1857","A"],["Wrote Arthashastra?","Kalidasa|Chanakya|Banabhatta|Panini","B"],["Ashoka's dynasty?","Gupta|Maurya|Mughal|Chola","B"],["Built Taj Mahal?","Akbar|Shah Jahan|Aurangzeb|Humayun","B"],["First woman ruler of Delhi?","Razia Sultan|Nur Jahan|Mumtaz|Chand Bibi","A"],["Vasco da Gama reached India:","1498|1492|1500|1526","A"],["Founded Maratha Empire?","Shivaji|Bajirao|Balaji|Sambhaji","A"],["Founded Brahmo Samaj?","Raja Ram Mohan Roy|Dayanand Saraswati|Vivekananda|Tagore","A"],["Founded Arya Samaj?","Dayanand Saraswati|Raja Ram Mohan Roy|Vivekananda|Tagore","A"],["INC founded in:","1885|1857|1905|1919","A"],["India independence:","15 Aug 1947|26 Jan 1950|15 Aug 1946|26 Jan 1947","A"],["Revolt of 1857 from:","Meerut|Delhi|Kanpur|Lucknow","A"],["First Governor-General?","Mountbatten|Rajagopalachari|Warren Hastings|Dalhousie","A"],["Wrote 'Vande Mataram'?","Bankim Chandra Chatterjee|Tagore|Premchand|Iqbal","A"],["Founded Sikh religion?","Guru Nanak|Guru Gobind Singh|Guru Arjan|Guru Tegh Bahadur","A"],["Light of Asia?","Buddha|Mahavira|Ashoka|Akbar","A"],["Buddha born at:","Lumbini|Sarnath|Bodh Gaya|Kushinagar","A"],["Mahavira associated with?","Jainism|Buddhism|Sikhism|Hinduism","A"],["Akbar's finance minister?","Todar Mal|Birbal|Tansen|Man Singh","A"],["Napoleon of India?","Samudragupta|Ashoka|Akbar|Chandragupta","A"],["Built Qutub Minar?","Qutub-ud-din Aibak|Iltutmish|Balban|Akbar","A"],["First Sultan of Delhi?","Qutub-ud-din Aibak|Iltutmish|Balban|Razia","A"],["Wrote Ain-i-Akbari?","Abul Fazl|Birbal|Todar Mal|Tansen","A"],["Battle of Haldighati:","1576|1526|1556|1761","A"],["Maharana Pratap from?","Mewar|Jaipur|Jodhpur|Bikaner","A"],["Shivaji crowned:","1674|1654|1684|1694","A"],["Third Battle of Panipat:","1761|1526|1556|1857","A"],["Founded Vijayanagara?","Harihara and Bukka|Krishnadevaraya|Rama Raya|Devaraya","A"],["Sikh Khalsa by?","Guru Gobind Singh|Guru Nanak|Guru Arjan|Guru Tegh Bahadur","A"],["Golden Temple at:","Amritsar|Lahore|Delhi|Chandigarh","A"],["Wrote Gitanjali?","Rabindranath Tagore|Bankim Chandra|Premchand|Iqbal","A"],["Rowlatt Act:","1919|1905|1929|1935","A"],["Frontier Gandhi?","Khan Abdul Ghaffar Khan|Nehru|Bose|Patel","A"],["Cripps Mission:","1942|1946|1930|1935","A"],["Cabinet Mission:","1946|1942|1935|1930","A"],["First Deputy PM?","Sardar Patel|Nehru|Rajendra Prasad|Ambedkar","A"],["Last Viceroy?","Mountbatten|Wavell|Linlithgow|Canning","A"],["First Indian Governor-General?","C. Rajagopalachari|Mountbatten|Rajendra Prasad|Nehru","A"],["President of Constituent Assembly?","Rajendra Prasad|Nehru|Ambedkar|Patel","A"],["Fundamental Rights?","6|5|7|8","A"],["Head of Indian State?","President|Prime Minister|Chief Justice|Speaker","A"],["Constitution into force:","26 Jan 1950|26 Nov 1949|15 Aug 1947|1 Jan 1950","A"],["Chairman of Rajya Sabha?","Vice-President|President|Speaker|PM","A"],["Min age President?","35|25|30|40","A"],["Fundamental Duties by?","42nd|44th|52nd|61st","A"],["Directive Principles in?","Part IV|Part III|Part V|Part VI","A"],["President's term?","5 years|4 years|6 years|7 years","A"],["Money Bill only in?","Lok Sabha|Rajya Sabha|Either House|Joint sitting","A"],["Preamble declares India as:","Sovereign Socialist Secular Democratic Republic|Federal|Monarchy|Confederation","A"],["Chairman Drafting Committee?","Dr. B.R. Ambedkar|Nehru|Patel|Rajendra Prasad","A"],["Rule of Law from?","Britain|USA|France|Ireland","A"],["Directive Principles from?","Ireland|Britain|USA|France","A"],["Supreme Commander Armed Forces?","President|Prime Minister|Defence Minister|Chief of Army","A"],["Max gap sessions?","6 months|3 months|1 year|2 years","A"],["No-Confidence Motion in?","Lok Sabha|Rajya Sabha|Either House|Joint sitting","A"],["Union Budget by?","Finance Minister|PM|President|RBI Governor","A"],["CEC by?","President|PM|Parliament|CJI","A"],["Finance Commission every?","5 years|3 years|4 years|6 years","A"],["NITI Aayog:","2015|2014|2013|2012","A"],["RBI:","1935|1947|1949|1950","A"],["42nd Amendment called?","Mini Constitution|Basic Structure|Golden Amendment|Silver Amendment","A"],["73rd Amendment?","Panchayati Raj|Municipalities|GST|EWS","A"],["44th Amendment removed?","Right to Property|Right to Equality|Right to Freedom|Right to Education","A"],["101st Amendment?","GST|EWS reservation|NCBC|Land boundary","A"],["8th Schedule languages?","22|18|14|25","A"],["National Anthem by?","Rabindranath Tagore|Bankim Chandra|Premchand|Iqbal","A"],["National Flag by?","Pingali Venkayya|Tagore|Nehru|Gandhi","A"],["Longest river in India?","Ganga|Yamuna|Godavari|Brahmaputra","A"],["Largest state?","Rajasthan|MP|Maharashtra|UP","A"],["Highest peak in India?","Kanchenjunga|K2|Nanda Devi|Everest","A"],["Longest river world?","Nile|Amazon|Yangtze|Mississippi","A"],["Largest ocean?","Pacific|Atlantic|Indian|Arctic","A"],["Largest continent?","Asia|Africa|Europe|Australia","A"],["Tropic of Cancer NOT through?","Odisha|Gujarat|Rajasthan|West Bengal","A"],["Suez Canal connects?","Red Sea & Mediterranean|Atlantic & Pacific|Black & Caspian|None","A"],["Ganga originates from?","Gangotri|Yamunotri|Kedarnath|Manasarovar","A"],["Capital of Australia?","Canberra|Sydney|Melbourne|Perth","A"],["Capital of USA?","Washington DC|New York|Chicago|LA","A"],["Capital of Japan?","Tokyo|Osaka|Kyoto|Nagoya","A"],["Capital of UK?","London|Manchester|Birmingham|Liverpool","A"],["Mount Everest in?","Nepal|India|China|Bhutan","A"],["Sahara Desert in?","Africa|Asia|Australia|S. America","A"],["Great Barrier Reef in?","Australia|Brazil|India|Mexico","A"],["Longest coastline state?","Gujarat|Tamil Nadu|Andhra|Maharashtra","A"],["Largest population state?","UP|Maharashtra|Bihar|WB","A"],["Longest mountain range?","Andes|Himalayas|Rockies|Alps","A"],["Deepest lake?","Baikal|Caspian|Superior|Victoria","A"],["Largest planet?","Jupiter|Earth|Mars|Saturn","A"],["Red Planet?","Mars|Venus|Jupiter|Mercury","A"],["Planets in solar system?","8|7|9|10","A"],["Sun is a:","Star|Planet|Comet|Asteroid","A"],["Sunlight reaches Earth in:","8 min|8 sec|8 hrs|8 days","A"],["First man on Moon?","Neil Armstrong|Yuri Gagarin|Buzz Aldrin|Michael Collins","A"],["Chandrayaan-1:","2008|2006|2007|2009","A"],["Ozone layer in?","Stratosphere|Troposphere|Mesosphere|Thermosphere","A"],["Most abundant gas?","Nitrogen|Oxygen|CO2|Argon","A"],["Highest literacy state?","Kerala|Goa|Tripura|Mizoram","A"],["Highest civilian award?","Bharat Ratna|Padma Shri|Padma Bhushan|Param Vir Chakra","A"],["Highest military award?","Param Vir Chakra|Ashoka Chakra|Maha Vir Chakra|Vir Chakra","A"],["Symbol of Sodium?","Na|So|Sd|Nu","A"],["Symbol of Gold?","Au|Go|Gd|Ag","A"],["Formula of Water?","H2O|HO2|OH2|H2O2","A"],["Gas humans need?","Oxygen|CO2|Nitrogen|Hydrogen","A"],["pH of pure water?","7|5|6|8","A"],["Vitamin from sunlight?","Vitamin D|Vitamin A|Vitamin B|Vitamin C","A"],["Vitamin A deficiency?","Night blindness|Scurvy|Rickets|Beri-beri","A"],["Iron deficiency?","Anaemia|Rickets|Scurvy|Goitre","A"],["Bones in adult?","206|208|210|212","A"],["Largest organ?","Skin|Liver|Brain|Heart","A"],["Teeth in adult?","32|28|30|34","A"],["Heart chambers?","4|2|3|5","A"],["Smallest bone?","Stapes|Femur|Tibia|Humerus","A"],["Longest bone?","Femur|Tibia|Humerus|Fibula","A"],["Organ purifies blood?","Kidney|Heart|Liver|Lungs","A"],["Insulin by?","Pancreas|Liver|Kidney|Spleen","A"],["Plants make food by?","Photosynthesis|Respiration|Transpiration|Digestion","A"],["Stomach acid?","Hydrochloric|Sulphuric|Nitric|Acetic","A"],["Hardest natural substance?","Diamond|Iron|Gold|Quartz","A"],["Gas in balloons?","Helium|Oxygen|Nitrogen|CO2","A"],["Liquid metal?","Mercury|Sodium|Lead|Iron","A"],["Unit of force?","Newton|Joule|Watt|Pascal","A"],["Unit of power?","Watt|Newton|Joule|Pascal","A"],["Unit of current?","Ampere|Volt|Ohm|Watt","A"],["Measures temperature?","Thermometer|Barometer|Hygrometer|Anemometer","A"],["Anopheles causes?","Malaria|Dengue|Chikungunya|Yellow fever","A"],["BCG for?","TB|Polio|DPT|Measles","A"],["Powerhouse of cell?","Mitochondria|Nucleus|Ribosome|Lysosome","A"],["Penicillin by?","Alexander Fleming|Edward Jenner|Louis Pasteur|Robert Koch","A"],["Gravity by?","Newton|Einstein|Galileo|Kepler","A"],["Currency of Japan?","Yen|Yuan|Won|Ringgit","A"],["National animal?","Tiger|Lion|Elephant|Peacock","A"],["National bird?","Peacock|Parrot|Eagle|Pigeon","A"],["National fruit?","Mango|Apple|Banana|Orange","A"],["IAF Day?","8 October|15 August|26 January|1 December","A"],["Republic Day?","26 Jan|15 Aug|2 Oct|14 Nov","A"],["Full form IAF?","Indian Air Force|Indian Army Force|International Air Force|Indian Armed Force","A"],["Full form ISRO?","Indian Space Research Org|International Space Research|Indian Science Research Org|None","A"],["Full form NDA?","National Defence Academy|National Defence Army|National Development Academy|None","A"],["Full form BSF?","Border Security Force|Border Safety Force|British Security Force|None","A"],["First woman President?","Pratibha Patil|Indira Gandhi|Sarojini Naidu|Droupadi Murmu","A"],["Missile Man?","APJ Abdul Kalam|Vikram Sarabhai|Homi Bhabha|C.V. Raman","A"],["Father of Indian Space Programme?","Vikram Sarabhai|Homi Bhabha|APJ Abdul Kalam|C.V. Raman","A"],["Full form CPU?","Central Processing Unit|Central Program Unit|Computer Processing Unit|None","A"],["Full form WWW?","World Wide Web|World Web Wide|Wide World Web|None","A"],["Full form GST?","Goods and Services Tax|General Sales Tax|Goods Sales Tax|None","A"],["Full form UPI?","Unified Payments Interface|United Payments Interface|Universal Payments Interface|None","A"],["Full form KYC?","Know Your Customer|Keep Your Customer|Know Your Client|None","A"],["Largest tea producer?","India|China|Kenya|Sri Lanka","A"],["Largest milk producer?","India|USA|China|Brazil","A"],["Land of Windmills?","Netherlands|Denmark|Belgium|Germany","A"],["Roof of World?","Tibet|Nepal|Bhutan|Mongolia","A"],["Playground of Europe?","Switzerland|Austria|Italy|France","A"],["Planet with rings?","Saturn|Mars|Venus|Mercury","A"],["Milky Way is a?","Galaxy|Star|Planet|Nebula","A"],["Study of universe?","Astronomy|Astrology|Cosmology|Geology","A"],["Land of Rising Sun?","Japan|China|Korea|Thailand","A"],["Nile flows through?","Egypt|Nigeria|Kenya|Morocco","A"],["Coldest place?","Antarctica|Siberia|Greenland|Alaska","A"],["Highest waterfall?","Angel Falls|Niagara|Victoria|Iguazu","A"],["Thar Desert in?","Rajasthan|Gujarat|MP|Haryana","A"],["Sundarbans famous for?","Mangroves|Tigers|Desert|Snow","A"],["Palk Strait separates?","Sri Lanka|Maldives|Bangladesh|Myanmar","A"],["Longest river in Asia?","Yangtze|Ganga|Mekong|Indus","A"],["Smallest country?","Vatican City|Monaco|Nauru|San Marino","A"],["Largest country?","Russia|Canada|China|USA","A"],["Line divides India-Pak?","Radcliffe Line|McMahon Line|Durand Line|Maginot Line","A"],["Largest delta?","Sundarbans|Nile|Mississippi|Mekong","A"],["Longest river South India?","Godavari|Krishna|Kaveri|Narmada","A"],["Hottest planet?","Venus|Mercury|Mars|Jupiter","A"],["Moon is a:","Natural satellite|Planet|Star|Comet","A"],["Mangalyaan:","2013|2012|2014|2015","A"],["Asteroid belt between?","Mars-Jupiter|Earth-Mars|Jupiter-Saturn|Saturn-Uranus","A"],["Measures atmospheric pressure?","Barometer|Thermometer|Hygrometer|Anemometer","A"],["Ozone protects from?","UV rays|Infrared|X-rays|Gamma rays","A"],["Ashoka Chakra spokes?","24|12|32|48","A"],["Symbol of Silver?","Ag|Si|Au|Sv","A"],["Symbol of Iron?","Fe|Ir|In|Io","A"],["Gas plants absorb?","CO2|Oxygen|Nitrogen|Hydrogen","A"],["Vitamin in citrus?","Vitamin C|Vitamin A|Vitamin B|Vitamin D","A"],["Vitamin C deficiency?","Scurvy|Night blindness|Rickets|Beri-beri","A"],["Vitamin D deficiency?","Rickets|Scurvy|Night blindness|Beri-beri","A"],["Iodine deficiency?","Goitre|Anaemia|Scurvy|Rickets","A"],["Bones in newborn?","270|206|300|180","A"],["Largest internal organ?","Liver|Skin|Lungs|Kidney","A"],["Universal donor?","O negative|A|B|AB","A"],["Body temp?","37 C|36 C|38 C|39 C","A"],["Study of human body?","Anatomy|Botany|Zoology|Geology","A"],["RBC produced in?","Bone marrow|Heart|Liver|Kidney","A"],["Heart beats/min?","60-100|40-60|100-120|120-150","A"],["Master Gland?","Pituitary|Thyroid|Adrenal|Pancreas","A"],["Gas we exhale?","CO2|Oxygen|Nitrogen|Hydrogen","A"],["Green pigment?","Chlorophyll|Haemoglobin|Carotene|Melanin","A"],["Acid in lemon?","Citric|Acetic|Lactic|Formic","A"],["Acid in milk?","Lactic|Citric|Acetic|Formic","A"],["Lightest element?","Hydrogen|Helium|Oxygen|Carbon","A"],["Best conductor?","Silver|Copper|Gold|Aluminium","A"],["Abundant metal in crust?","Aluminium|Iron|Copper|Zinc","A"],["Speed of light?","3x10^8 m/s|3x10^6 m/s|3x10^5 m/s|3x10^7 m/s","A"],["Speed of sound?","343 m/s|300 m/s|400 m/s|500 m/s","A"],["Unit of energy?","Joule|Newton|Watt|Pascal","A"],["SI unit temp?","Kelvin|Celsius|Fahrenheit|Rankine","A"],["Measures earthquakes?","Seismograph|Barometer|Hygrometer|Anemometer","A"],["Aedes causes?","Dengue|Malaria|Cholera|Typhoid","A"],["Dog bite causes?","Rabies|Malaria|Dengue|Typhoid","A"],["Disease by bacteria?","Tuberculosis|AIDS|Malaria|Ringworm","A"],["OPV for?","Polio|TB|DPT|Measles","A"],["Largest gland?","Liver|Pancreas|Thyroid|Salivary","A"],["Largest cell?","Ovum|Nerve cell|Muscle cell|RBC","A"],["Fight infection?","WBC|RBC|Platelets|Plasma","A"],["Help clotting?","Platelets|RBC|WBC|Plasma","A"],["Normal BP?","120/80|140/90|100/60|160/100","A"],["X-rays by?","Roentgen|Becquerel|Curie|Thomson","A"],["Electron by?","J.J. Thomson|Rutherford|Chadwick|Dalton","A"],["Neutron by?","Chadwick|Rutherford|Thomson|Dalton","A"],["Relativity by?","Einstein|Newton|Galileo|Kepler","A"],["Farthest planet?","Neptune|Uranus|Saturn|Jupiter","A"],["Most moons?","Saturn|Jupiter|Mars|Venus","A"],["Currency of USA?","Dollar|Pound|Euro|Yen","A"],["Currency of UK?","Pound|Dollar|Euro|Yen","A"],["National flower?","Lotus|Rose|Sunflower|Marigold","A"],["National tree?","Banyan|Neem|Peepal|Mango","A"],["National aquatic animal?","Dolphin|Whale|Turtle|Shark","A"],["Indian Army Day?","15 Jan|26 Jan|8 Oct|4 Dec","A"],["Gandhi Jayanti?","2 Oct|14 Nov|15 Aug|26 Jan","A"],["Children's Day?","14 Nov|2 Oct|15 Aug|5 Sep","A"],["Teachers' Day?","5 Sep|14 Nov|2 Oct|15 Aug","A"],["Environment Day?","5 June|22 April|1 May|8 March","A"],["Yoga Day?","21 June|5 June|7 April|1 May","A"],["Full form DRDO?","Defence Research and Development Organisation|Defence Research Dept Org|Direct Research Dev Org|None","A"],["Full form CRPF?","Central Reserve Police Force|Central Rapid Police Force|Central Regional Police Force|None","A"],["Full form RAW?","Research and Analysis Wing|Research and Action Wing|Rapid Action Wing|None","A"],["Full form CBI?","Central Bureau of Investigation|Central Bureau of Intelligence|Crime Bureau of India|None","A"],["First PVC awardee?","Major Somnath Sharma|Captain Vikram Batra|Abdul Hamid|Arun Khetarpal","A"],["First woman IPS?","Kiran Bedi|Sarojini Naidu|Indira Gandhi|Sucheta Kripalani","A"],["First woman PM?","Indira Gandhi|Pratibha Patil|Sarojini Naidu|Sucheta Kripalani","A"],["First Indian Nobel?","Rabindranath Tagore|C.V. Raman|Mother Teresa|Amartya Sen","A"],["First Indian in space?","Rakesh Sharma|Kalpana Chawla|Sunita Williams|Vikram Sarabhai","A"],["Milkman of India?","Verghese Kurien|M.S. Swaminathan|Homi Bhabha|Vikram Sarabhai","A"],["Father of Green Revolution?","M.S. Swaminathan|Verghese Kurien|Norman Borlaug|Homi Bhabha","A"],["Full form ATM?","Automated Teller Machine|Automatic Transfer Machine|Automated Transfer Mode|None","A"],["Full form RAM?","Random Access Memory|Read Access Memory|Rapid Access Memory|None","A"],["Full form HTML?","HyperText Markup Language|HyperText Machine Language|HighText Markup Language|None","A"],["Full form GPS?","Global Positioning System|Global Position System|General Positioning System|None","A"],["Full form SIM?","Subscriber Identity Module|Subscriber Identification Module|Simple Identity Module|None","A"],["Full form LED?","Light Emitting Diode|Low Emitting Diode|Light Energy Diode|None","A"],["Full form USB?","Universal Serial Bus|United Serial Bus|Universal System Bus|None","A"],["Full form PIN?","Personal Identification Number|Private Identification Number|Personal Identity Number|None","A"],["Full form PAN?","Permanent Account Number|Personal Account Number|Permanent Access Number|None","A"],["Full form SEBI?","Securities and Exchange Board of India|Stock Exchange Board of India|Securities and Exchange Bureau of India|None","A"],["Full form NCERT?","National Council of Educational Research and Training|National Centre of Educational Research and Training|National Council of Education Research and Training|None","A"],["Full form CBSE?","Central Board of Secondary Education|Central Bureau of Secondary Education|Central Board of School Education|None","A"],["Land of Thunder Dragon?","Bhutan|Nepal|Tibet|Mongolia","A"],["Largest island?","Greenland|Madagascar|Borneo|Sumatra","A"],["Smallest continent?","Australia|Europe|Antarctica|S. America","A"]];
+
+const S={rollNo:"",name:"",questions:[],answers:[],current:0,timeLeft:0,deadline:0,timerId:null,running:false,submitted:false,violations:{tabSwitches:0,blur:0,rightClicks:0,copyAttempts:0,devtools:0,fullscreenExits:0,events:[]},saveTimerId:null};
+
+let clockTimer=null;
+function updateClock(){
+  const state=getWindowState();
+  const now=Date.now();
+  const st=$('clockStatus'),tm=$('clockTime'),sb=$('clockSub');
+  if(state==="waiting"){
+    st.className="status waiting";st.textContent="⏰ Test starts in";
+    tm.textContent=fmtClock(getTodayStart()-now);
+    sb.textContent="Test window: 4:00 PM - 5:00 PM";
+  }else if(state==="live"){
+    st.className="status live";st.textContent="🟢 TEST IS LIVE";
+    tm.textContent=fmtClock(getTodayEnd()-now);
+    sb.textContent="Closes at 5:00 PM";
+  }else{
+    st.className="status closed";st.textContent="🔒 Test window closed";
+    tm.textContent="--:--:--";sb.textContent="Test was: 4:00 PM - 5:00 PM";
+  }
+  const btn=$('btnStart');
+  btn.disabled=(state!=="live");
+  btn.textContent=state==="waiting"?"⏰ Wait till 4:00 PM":state==="closed"?"🔒 Closed":"Start Test →";
+}
+function startClock(){updateClock();clearInterval(clockTimer);clockTimer=setInterval(updateClock,1000);}
+
+function normalizeRoll(v){return v.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'');}
+
+function startEntry(){
+  const state=getWindowState();
+  const err=$('entryErr');err.textContent="";
+  if(state==="waiting"){err.textContent="⏰ Test 4:00 PM pe start hoga";return;}
+  if(state==="closed"){err.textContent="🔒 Test window closed (5:00 PM)";return;}
+  const roll=normalizeRoll($('inpRoll').value);
+  const name=$('inpName').value.trim();
+  if(roll.length<2){err.textContent="⚠ Roll No daalo (min 2 chars)";return;}
+  if(name.length<2){err.textContent="⚠ Naam daalo (min 2 chars)";return;}
+  if(!fbReady){err.textContent="⏳ Firebase connecting... 2 sec";return;}
+  S.rollNo=roll;S.name=name;
+  const ref=db.ref(EVENT_KEY+"/students/"+roll);
+  $('entryErr').textContent="⏳ Checking...";
+  ref.once("value").then(snap=>{
+    const data=snap.val();
+    const now=Date.now();
+    if(data){
+      if(data.status==="completed"){showBlocked(data);return;}
+      if(data.status==="active"){
+        if(now<data.deadline){
+          S.questions=JSON.parse(data.questionsJSON||"[]");
+          S.answers=data.answers||new Array(S.questions.length).fill(null);
+          S.deadline=data.deadline;
+          S.violations=Object.assign(S.violations,data.violations||{});
+          $('testName').textContent=name;$('testRoll').textContent=roll;
+          showInstr(true);return;
+        }
+        ref.update({status:"completed",completedAt:now,autoSubmitReason:"time_exceeded"});
+        showBlocked(data);return;
+      }
+    }
+    const eng=shuffle(parseQ(ENGLISH)).slice(0,15);
+    const gk=shuffle(parseQ(GK)).slice(0,15);
+    S.questions=eng.concat(gk);
+    S.answers=new Array(S.questions.length).fill(null);
+    S.violations={tabSwitches:0,blur:0,rightClicks:0,copyAttempts:0,devtools:0,fullscreenExits:0,events:[]};
+    $('testName').textContent=name;$('testRoll').textContent=roll;
+    showInstr(false);
+  }).catch(e=>{err.textContent="❌ Connection error";console.error(e);});
+}
+
+function showBlocked(data){
+  $('blockedSub').textContent=data.status==="completed"?"You have already attempted this test":"Access denied";
+  $('blockedInfo').innerHTML='<h4>📊 Aapka Result</h4><ul><li>Roll: <b>'+esc(data.rollNo||S.rollNo)+'</b></li><li>Name: <b>'+esc(data.name||S.name)+'</b></li><li>Score: <b>'+esc(data.score||0)+' / 30</b> ('+esc(data.pct||0)+'%)</li><li>Status: <b>'+esc(data.status)+'</b></li></ul>';
+  go('blocked');
+}
+
+function showInstr(resume){
+  const btn=document.querySelector('#instr .btn');
+  btn.textContent=resume?'Resume Test →':'Start Test →';
+  if(resume){
+    const remaining=Math.max(0,Math.floor((S.deadline-Date.now())/1000));
+    $('instrTime').textContent=fmtTime(remaining)+" left";
+  }else{$('instrTime').textContent="30 Minutes (max till 5:00 PM)";}
+  go('instr');
+}
+function exitTest(){$('inpRoll').value="";$('inpName').value="";$('entryErr').textContent="";go('entry');}
+
+function beginTest(){
+  if(!S.questions.length)return;
+  const now=Date.now();
+  const windowEnd=getTodayEnd();
+  if(!S.deadline){S.deadline=Math.min(now+TEST_DURATION_SEC*1000,windowEnd);}
+  db.ref(EVENT_KEY+"/students/"+S.rollNo).update({
+    rollNo:S.rollNo,name:S.name,status:"active",startedAt:now,deadline:S.deadline,
+    questionsJSON:JSON.stringify(S.questions),answers:S.answers,violations:S.violations,
+    userAgent:navigator.userAgent.substring(0,150)
+  }).catch(e=>console.warn(e));
+  S.running=true;S.submitted=false;
+  activateAntiCheat();
+  try{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(e){}
+  loadQ();startTimer();startAutoSave();go('test');
+}
+
+function loadQ(){
+  const q=S.questions[S.current];if(!q)return;
+  $('qNow').textContent=S.current+1;$('qTot').textContent=S.questions.length;
+  $('qSec').textContent=S.current<15?"ENGLISH":"GK / GS";
+  $('qText').textContent=q.q;
+  const box=$('optBox');box.innerHTML="";
+  const L=["A","B","C","D"];
+  q.o.forEach((opt,i)=>{
+    const d=document.createElement('div');
+    d.className="opt"+(S.answers[S.current]===L[i]?" sel":"");
+    d.innerHTML='<div class="lt">'+L[i]+'</div><div>'+esc(opt)+'</div>';
+    d.onclick=()=>selectOpt(L[i]);
+    box.appendChild(d);
+  });
+  $('btnPrev').disabled=S.current===0;
+  $('btnNext').textContent=S.current===S.questions.length-1?"Submit ✓":"Next →";
+  const a=S.answers.filter(x=>x!==null).length;
+  $('answered').textContent=a+" answered";
+  $('qScroll').scrollTop=0;
+}
+function selectOpt(l){S.answers[S.current]=l;loadQ();saveState();}
+function navQ(d){if(d===1&&S.current===S.questions.length-1){confirmSubmit();return;}S.current=Math.max(0,Math.min(S.questions.length-1,S.current+d));loadQ();}
+function startTimer(){clearInterval(S.timerId);tick();S.timerId=setInterval(tick,1000);}
+function tick(){
+  S.timeLeft=Math.max(0,Math.ceil((S.deadline-Date.now())/1000));
+  const m=Math.floor(S.timeLeft/60),s=S.timeLeft%60;
+  const t=$('timer');t.textContent=pad(m)+":"+pad(s);
+  if(S.timeLeft<=60)t.classList.add('warn');else t.classList.remove('warn');
+  if(S.timeLeft<=0&&S.running){clearInterval(S.timerId);autoSubmit("time_up");}
+}
+function startAutoSave(){clearInterval(S.saveTimerId);S.saveTimerId=setInterval(saveState,8000);}
+function saveState(){if(!S.running||S.submitted)return;db.ref(EVENT_KEY+"/students/"+S.rollNo).update({answers:S.answers,violations:S.violations}).catch(()=>{});}
+
+function confirmSubmit(){
+  const un=S.answers.filter(x=>x===null).length;
+  const msg=un>0?un+" questions unanswered. Submit?":"Submit your test?";
+  if(!confirm(msg))return;doSubmit("manual");
+}
+function autoSubmit(reason){
+  if(S.submitted)return;
+  if(reason==="time_up")alert("⏰ Time up! Auto-submitting...");
+  doSubmit(reason);
+}
+function doSubmit(reason){
+  if(S.submitted)return;S.submitted=true;S.running=false;
+  clearInterval(S.timerId);clearInterval(S.saveTimerId);deactivateAntiCheat();
+  let correct=0,wrong=0,skip=0;
+  S.questions.forEach((q,i)=>{
+    const u=S.answers[i];
+    if(u===null)skip++;else if(u===q.a)correct++;else wrong++;
+  });
+  const total=S.questions.length;
+  const score=correct-(wrong*0.25);
+  const pct=Math.max(0,Math.round((score/total)*100));
+  const timeTaken=Math.floor((Date.now()-(S.deadline-TEST_DURATION_SEC*1000))/1000);
+  const result={rollNo:S.rollNo,name:S.name,status:"completed",completedAt:Date.now(),submitReason:reason,total,correct,wrong,skip,score:parseFloat(score.toFixed(2)),pct,timeTaken,violations:S.violations,suspicious:isSuspicious(pct,timeTaken,S.violations)};
+  $('resPct').textContent=pct+"%";
+  $('resScore').textContent=score.toFixed(2)+" / "+total;
+  $('sTotal').textContent=total;$('sCorrect').textContent=correct;
+  $('sWrong').textContent=wrong;$('sSkip').textContent=skip;
+  const ring=$('ringCircle');ring.style.transition='stroke-dashoffset .8s';
+  ring.style.strokeDashoffset=408-(408*pct/100);
+  let v="";
+  if(pct>=85)v="🏆 Outstanding!";
+  else if(pct>=70)v="⭐ Excellent!";
+  else if(pct>=50)v="👍 Good!";
+  else if(pct>=30)v="📖 Keep practicing!";
+  else v="💪 Don't give up!";
+  $('resVerdict').textContent=v;
+  const v2=S.violations;
+  const tv=(v2.tabSwitches||0)+(v2.rightClicks||0)+(v2.copyAttempts||0)+(v2.devtools||0)+(v2.fullscreenExits||0);
+  if(tv>0){
+    $('cheatSummary').innerHTML='<div class="warn-box" style="margin-top:14px"><b>⚠️ Violations:</b><br>Tab switches: '+v2.tabSwitches+'<br>Right clicks: '+v2.rightClicks+'<br>Copy attempts: '+v2.copyAttempts+'<br>Dev tools: '+v2.devtools+'<br>Fullscreen exits: '+v2.fullscreenExits+'</div>';
+  }
+  $('syncStatus').textContent="☁️ Saving...";
+  db.ref(EVENT_KEY+"/students/"+S.rollNo).update(result).then(()=>{
+    $('syncStatus').textContent="✅ Submitted successfully!";
+    $('syncStatus').style.color="#34d399";
+  }).catch(e=>{
+    $('syncStatus').textContent="⚠️ Save failed";
+    $('syncStatus').style.color="#f87171";
+  });
+  go('result');
+}
+function isSuspicious(pct,timeTaken,v){
+  if((v.tabSwitches||0)>=2)return true;
+  if((v.devtools||0)>0)return true;
+  if(pct>=90&&timeTaken<300)return true;
+  return false;
+}
+
+let antiCheatHandlers={};
+function activateAntiCheat(){
+  antiCheatHandlers.vis=()=>{
+    if(document.hidden&&S.running&&!S.submitted){
+      S.violations.tabSwitches++;
+      S.violations.events.push({t:'tab_switch',ts:Date.now()});
+      saveState();
+      if(S.violations.tabSwitches>=MAX_TAB_SWITCHES){
+        doSubmit("cheat_tab_limit");
+        setTimeout(()=>alert("🚨 CHEATING DETECTED!\n\n3 tab switches.\nTest auto-submitted."),100);
+      }else{showWarn(S.violations.tabSwitches);}
+    }
+  };
+  document.addEventListener("visibilitychange",antiCheatHandlers.vis);
+  antiCheatHandlers.blur=()=>{if(S.running&&!S.submitted)S.violations.blur++;};
+  window.addEventListener("blur",antiCheatHandlers.blur);
+  antiCheatHandlers.ctx=e=>{if(S.running){e.preventDefault();S.violations.rightClicks++;}};
+  document.addEventListener("contextmenu",antiCheatHandlers.ctx);
+  antiCheatHandlers.copy=e=>{
+    if(S.running){const tag=(e.target&&e.target.tagName)||"";
+      if(tag!=="INPUT"&&tag!=="TEXTAREA"){e.preventDefault();S.violations.copyAttempts++;}}
+  };
+  document.addEventListener("copy",antiCheatHandlers.copy);
+  document.addEventListener("cut",antiCheatHandlers.copy);
+  antiCheatHandlers.key=e=>{
+    if(!S.running)return;const k=e.key;
+    if(k==="F12"||(e.ctrlKey&&e.shiftKey&&["I","J","C"].includes(k.toUpperCase()))||(e.ctrlKey&&k==="u")){
+      e.preventDefault();S.violations.devtools++;
+    }
+    if(e.ctrlKey&&["c","p","s"].includes(k.toLowerCase())){
+      const tag=(e.target&&e.target.tagName)||"";
+      if(tag!=="INPUT"&&tag!=="TEXTAREA"){e.preventDefault();if(k.toLowerCase()==="c")S.violations.copyAttempts++;}
+    }
+  };
+  document.addEventListener("keydown",antiCheatHandlers.key);
+  antiCheatHandlers.fs=()=>{if(S.running&&!document.fullscreenElement&&!document.webkitFullscreenElement){S.violations.fullscreenExits++;}};
+  document.addEventListener("fullscreenchange",antiCheatHandlers.fs);
+  document.addEventListener("webkitfullscreenchange",antiCheatHandlers.fs);
+  antiCheatHandlers.bu=e=>{if(S.running&&!S.submitted){e.preventDefault();e.returnValue="";}};
+  window.addEventListener("beforeunload",antiCheatHandlers.bu);
+}
+function deactivateAntiCheat(){
+  document.removeEventListener("visibilitychange",antiCheatHandlers.vis);
+  window.removeEventListener("blur",antiCheatHandlers.blur);
+  document.removeEventListener("contextmenu",antiCheatHandlers.ctx);
+  document.removeEventListener("copy",antiCheatHandlers.copy);
+  document.removeEventListener("cut",antiCheatHandlers.copy);
+  document.removeEventListener("keydown",antiCheatHandlers.key);
+  document.removeEventListener("fullscreenchange",antiCheatHandlers.fs);
+  document.removeEventListener("webkitfullscreenchange",antiCheatHandlers.fs);
+  window.removeEventListener("beforeunload",antiCheatHandlers.bu);
+  try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});}catch(e){}
+}
+function showWarn(c){
+  $('warnTitle').textContent="⚠️ Warning "+c+"/"+MAX_TAB_SWITCHES;
+  $('warnMsg').innerHTML=c>=MAX_TAB_SWITCHES-1?"<b style='color:#f87171'>Last warning!</b><br><br>Ek aur = auto-submit.":"Tab switch detected. Warning <b>"+c+"</b>.<br><br><b>3 warnings = auto submit.</b>";
+  $('warnOverlay').classList.add('show');
+}
+function closeWarn(){$('warnOverlay').classList.remove('show');}
+
+function openPin(){$('pinOverlay').classList.add('show');$('pinInput').value="";$('pinErr').textContent="";setTimeout(()=>$('pinInput').focus(),100);}
+function checkPin(){
+  if($('pinInput').value===ADMIN_PIN){closePin();go('admin');startAdminLive();}
+  else{$('pinErr').textContent="❌ Wrong PIN";$('pinInput').value="";$('pinInput').focus();}
+}
+function closePin(){$('pinOverlay').classList.remove('show');$('pinInput').value="";$('pinErr').textContent="";}
+
+let ADM_ROWS=[],ADM_LISTENER=null,ADM_TAB='overview';
+function leaveAdmin(){if(ADM_LISTENER){try{ADM_LISTENER.ref.off("value",ADM_LISTENER.cb);}catch(e){}ADM_LISTENER=null;}go('entry');}
+function startAdminLive(){
+  const box=$('admBox');
+  if(!db){box.innerHTML='<div class="empty">Firebase connecting...</div>';setTimeout(startAdminLive,1000);return;}
+  if(ADM_LISTENER){try{ADM_LISTENER.ref.off("value",ADM_LISTENER.cb);}catch(e){}}
+  $('admSub').textContent="Loading...";box.innerHTML='<div class="loading">Fetching...</div>';
+  const ref=db.ref(EVENT_KEY+"/students");
+  const cb=ref.on("value",snap=>{
+    const rows=[];snap.forEach(d=>{rows.push(Object.assign({rollNo:d.key},d.val()));});
+    ADM_ROWS=rows;
+    const c=rows.filter(r=>r.status==="completed").length;
+    const a=rows.filter(r=>r.status==="active").length;
+    $('admSub').textContent="Live · "+c+" done, "+a+" in-progress";
+    renderAdmin();
+  },e=>{box.innerHTML='<div class="empty">❌ '+esc(e.code||e.message)+'</div>';});
+  ADM_LISTENER={ref,cb};
+}
+function switchTab(t,btn){ADM_TAB=t;document.querySelectorAll('#admin .tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderAdmin();}
+function renderAdmin(){
+  const box=$('admBox');
+  if(!ADM_ROWS.length){box.innerHTML='<div class="empty">Abhi koi attempt nahi.</div>';return;}
+  const completed=ADM_ROWS.filter(r=>r.status==="completed");
+  const active=ADM_ROWS.filter(r=>r.status==="active");
+  if(ADM_TAB==="overview"){
+    const avg=completed.length?Math.round(completed.reduce((a,r)=>a+(r.pct||0),0)/completed.length):0;
+    const top=completed.length?Math.max(...completed.map(r=>r.pct||0)):0;
+    const s=completed.filter(r=>r.suspicious).length;
+    box.innerHTML='<div class="kpis"><div class="kpi"><b>'+completed.length+'</b><span>Completed</span></div><div class="kpi"><b>'+active.length+'</b><span>In Progress</span></div><div class="kpi"><b>'+avg+'%</b><span>Average</span></div><div class="kpi"><b>'+top+'%</b><span>Topper</span></div></div>'+(s>0?'<div class="warn-box">⚠️ <b>'+s+' suspicious</b> — Cheat Log dekho</div>':'<div class="info-box">✅ Koi cheating nahi</div>');
+    return;
+  }
+  if(ADM_TAB==="ranking"){
+    const s=completed.slice().sort((a,b)=>(b.pct||0)-(a.pct||0));
+    if(!s.length){box.innerHTML='<div class="empty">Koi completed attempt nahi.</div>';return;}
+    box.innerHTML=s.map((r,i)=>{
+      const rk=i+1;const cls=rk===1?"r1":(rk===2?"r2":(rk===3?"r3":""));
+      const m=rk===1?"🥇":(rk===2?"🥈":(rk===3?"🥉":rk));
+      const fl=[];
+      if(r.suspicious)fl.push('<span class="flag red">SUSPICIOUS</span>');
+      const v=r.violations||{};
+      const vt=(v.tabSwitches||0)+(v.rightClicks||0)+(v.copyAttempts||0)+(v.devtools||0);
+      if(vt>0&&!r.suspicious)fl.push('<span class="flag yellow">'+vt+' violations</span>');
+      return '<div class="row"><div class="rank-badge '+cls+'">'+m+'</div><div class="av">'+esc((r.name||'?').charAt(0).toUpperCase())+'</div><div class="m"><b>'+esc(r.name)+' '+fl.join('')+'</b><small>'+esc(r.rollNo)+' · ✓'+(r.correct||0)+' ✗'+(r.wrong||0)+' ⊘'+(r.skip||0)+' · '+fmtTime(r.timeTaken)+'</small></div><div class="pct '+((r.pct||0)>=70?'g':(r.pct>=40?'y':'r'))+'">'+r.pct+'%</div></div>';
+    }).join("");
+    return;
+  }
+  if(ADM_TAB==="cheat"){
+    const f=completed.filter(r=>{const v=r.violations||{};return r.suspicious||(v.tabSwitches||0)>0||(v.devtools||0)>0||(v.copyAttempts||0)>0;}).sort((a,b)=>(b.violations?.tabSwitches||0)-(a.violations?.tabSwitches||0));
+    if(!f.length){box.innerHTML='<div class="empty">✅ Koi cheating nahi.</div>';return;}
+    box.innerHTML=f.map(r=>{
+      const v=r.violations||{};
+      return '<div class="row"><div class="av" style="background:#3a1e1e;color:#f87171">⚠️</div><div class="m"><b>'+esc(r.name)+' <span class="flag red">FLAGGED</span></b><small>'+esc(r.rollNo)+'<br>Tabs:'+(v.tabSwitches||0)+' • RClick:'+(v.rightClicks||0)+' • Copy:'+(v.copyAttempts||0)+' • Dev:'+(v.devtools||0)+' • FS:'+(v.fullscreenExits||0)+'<br>Score: '+r.pct+'% • Time: '+fmtTime(r.timeTaken)+'</small></div></div>';
+    }).join("");
+    return;
+  }
+  if(ADM_TAB==="active"){
+    if(!active.length){box.innerHTML='<div class="empty">Koi in-progress nahi.</div>';return;}
+    box.innerHTML=active.map(r=>{
+      const el=Math.floor((Date.now()-(r.startedAt||0))/1000);
+      const lf=Math.max(0,Math.floor(((r.deadline||0)-Date.now())/1000));
+      return '<div class="row"><div class="av" style="background:#1e3a2e;color:#34d399">▶</div><div class="m"><b>'+esc(r.name)+'</b><small>'+esc(r.rollNo)+' · Started '+fmtTime(el)+' ago · '+fmtTime(lf)+' left</small></div></div>';
+    }).join("");
+    return;
+  }
+}
+function exportCSV(){
+  const c=ADM_ROWS.filter(r=>r.status==="completed");
+  if(!c.length){alert("No data");return;}
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const h=["Rank","Roll No","Name","Score","Percent","Correct","Wrong","Skipped","Time","Reason","TabSwitches","RightClicks","CopyAttempts","DevTools","FSExits","Suspicious"];
+  const s=c.slice().sort((a,b)=>(b.pct||0)-(a.pct||0));
+  const lines=[h.join(",")];
+  s.forEach((r,i)=>{
+    const v=r.violations||{};
+    lines.push([i+1,r.rollNo,r.name,r.score,r.pct,r.correct,r.wrong,r.skip,fmtTime(r.timeTaken),r.submitReason,v.tabSwitches||0,v.rightClicks||0,v.copyAttempts||0,v.devtools||0,v.fullscreenExits||0,r.suspicious?"YES":"no"].map(q).join(","));
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"}));
+  a.download="mock_test_report_"+new Date().toISOString().slice(0,10)+".csv";
+  a.click();
+}
+
+// ===== Netlify Badge Remover =====
+(function(){
+  function killBadge(){
+    document.querySelectorAll('a[href*="netlify.com"],iframe[title*="Netlify"],iframe[src*="netlify.com"],.netlify-badge,div[data-netlify-badge],[data-netlify="true"],[id^="netlify-badge"],[class*="netlify-badge"]').forEach(function(el){
+      try{el.style.display='none';el.style.visibility='hidden';el.style.opacity='0';el.style.pointerEvents='none';el.remove();}catch(e){}
+    });
+  }
+  killBadge();
+  setInterval(killBadge,500);
+  window.addEventListener('load',killBadge);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',killBadge);
+  else killBadge();
+})();
+
+window.addEventListener('load',()=>{
+  startClock();
+  setTimeout(()=>{try{$('inpRoll').focus();}catch(e){}},300);
+});
+</script>
+</body>
+</html>
+```
